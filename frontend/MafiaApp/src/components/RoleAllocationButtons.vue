@@ -139,7 +139,6 @@ export default {
 .buttons-grid {
   display: flex;
   gap: 20px;
-  justify-content: center;
   position: relative;
 }
 
@@ -147,6 +146,8 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 60px;
+  min-height: 400px;
 }
 
 .popup {

@@ -2,12 +2,12 @@
   <div v-if="listPlayers.length" class="buttons-grid">
     <div class="column">
       <div v-for="(item, index) in firstColumn" :key="index">
-        <ButtonPlayer :item="item" :index="index" @show-player="showPlayer(item)" />
+        <ButtonPlayer :item="item" :index="index" :currentRole="currentRole" @show-player="showPlayer" />
       </div>
     </div>
     <div class="column">
       <div v-for="(item, index) in secondColumn" :key="index">
-        <ButtonPlayer :item="item" :index="index + 5" @show-player="showPlayer(item)" />
+        <ButtonPlayer :item="item" :index="index + 5" :currentRole="currentRole" @show-player="showPlayer" />
       </div>
     </div>
   </div>
@@ -22,9 +22,9 @@ export default {
   },
 
   props: {
-    listPlayers: {
+     listPlayers: {
       type: Array,
-      required: true,
+      required: true
     },
     currentRole: {
       type: String,
@@ -41,20 +41,11 @@ export default {
     },
   },
 
-  data() {
-    return {
-      api: new ApiClient(),
-      currentPlayerIndex: 0,
-      showPopup: false,
-      selectedRole: null,
-    };
-  },
-
   methods: {
-    showPlayer(player) {
-      player.showNickname = !player.showNickname;
-    },
-  },
+    showPlayer(index) {
+      this.listPlayers[index].showNickname = !this.listPlayers[index].showNickname;
+    }
+  }
 };
 </script>
 

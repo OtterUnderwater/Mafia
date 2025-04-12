@@ -45,9 +45,15 @@ export default {
       return {
         totalSeconds: 30,
         isPaused: true,
-        currentRole: "Don",
+        rolesTime: [ 'Don', 'Mafia', 'Sheriff'],
+        currentRole: null
       };
     },
+
+    created() {
+      this.currentRole = this.rolesTime[0]
+    },
+
     methods: {
       togglePause() {
         this.isPaused = !this.isPaused;

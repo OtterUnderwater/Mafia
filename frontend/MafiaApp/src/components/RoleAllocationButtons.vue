@@ -16,7 +16,6 @@
           @show-role="showRole(index)" />
       </div>
     </div>
-
     <div v-if="showPopup && selectedRole" :class="['popup', roleColorClass]" @click="hidePopup">
       <p>{{ selectedRole }}</p>
     </div>
@@ -24,23 +23,13 @@
 </template>
 
 <script>
-import ButtonRole from './ButtonRole.vue';
+import ButtonRole from './items/ButtonRole.vue';
 import { ApiClient } from '@domain/api-client.js';
+import { RoleEnum } from '@/constants/enums.js';
 
 export default {
   components: {
     ButtonRole,
-  },
-
-  props: {
-    gameId: {
-      type: Number,
-      required: true,
-    },
-    listPlayers: {
-      type: Array,
-      required: true,
-    },
   },
 
   computed: {
@@ -54,15 +43,12 @@ export default {
       if (!this.selectedRole) {
         return '';
       }
-
-      if (this.selectedRole === 'Mafia' || this.selectedRole === 'Don') {
+      if (this.selectedRole === RoleEnum.MAFIA || this.selectedRole === RoleEnum.DON) {
         return 'popup-black';
       }
-
-      if (this.selectedRole === 'Civilian' || this.selectedRole === 'Sheriff') {
+      if (this.selectedRole === RoleEnum.CIVILIAN || this.selectedRole === RoleEnum.SHERIFF) {
         return 'popup-red';
       }
-
       return '';
     },
   },
@@ -101,32 +87,37 @@ export default {
 
     async assignRole() {
       if (!this.showPopup) return;
-      if (this.currentPlayerIndex >= this.listPlayers.length) return;
+      if (this.currentPlayerIndex >= this.$store.state.players.length) return;
       const role = this.rolesToAssign[this.selectedRoleIndex];
-      this.listPlayers[this.currentPlayerIndex].role = role;
+      this.$store.commit('updatePlayer', { index: this.currentPlayerIndex, property: 'role', value: role });
       this.rolesToAssign.splice(this.selectedRoleIndex, 1);
       this.currentPlayerIndex++;
-      if (this.currentPlayerIndex === this.listPlayers.length) {
-        await this.postPlayerStatus();
-        this.$emit('show-game', this.listPlayers);
+      if (this.currentPlayerIndex === this.$store.state.players.length) {
+        if (!this.$store.state.anonymousGame) {
+          await this.postPlayerStatus();
+        }
+        this.$emit('show-game');
       }
       this.selectedRoleIndex = null;
       this.selectedRole = null;
       this.showPopup = false;
     },
+
     async postPlayerStatus() {
       try {
-        for (let i = 0; i < this.listPlayers.length; i++) {
-          this.listPlayers[i].idPS = await this.api.postPlayerStatus(
-            this.listPlayers[i].id,
-            this.gameId,
-            this.listPlayers[i].role
+        for (let i = 0; i < this.$store.state.players.length; i++) {
+          const idPS = await this.api.postPlayerStatus(
+            this.$store.state.players[i].id,
+            this.$store.state.gameId,
+            this.$store.state.players[i].role
           );
+          this.$store.commit('updatePlayer', { index: i, property: 'idPS', value: idPS });
         }
       } catch (error) {
         console.error('Error when sending roles to the database:', error);
       }
     },
+    
     hidePopup() {
       if (!this.showPopup) return;
       this.assignRole();

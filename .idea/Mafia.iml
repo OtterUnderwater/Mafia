@@ -5,8 +5,9 @@
       <sourceFolder url="file://$MODULE_DIR$/backend" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/frontend" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/certs" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.13 (Mafia)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.13 (Mafia) (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

@@ -1,16 +1,16 @@
 <template>
-    <header class="mafia-header">
-      <img class="icon-mafia" src="./components/icons/IconMafia.png" alt="Mafia Icon"/>
-      MAFIA
-    </header>
-    <main>
+  <header class="mafia-header">
+    <img class="icon-mafia" src="./components/icons/IconMafia.png" alt="Mafia Icon" />
+    MAFIA
+  </header>
+  <main>
     <div id="app">
       <button class="start-game-button" v-if="showBtnStartGame" @click="startGame">Create a game</button>
-      <div class="main-content" >
-        <PlayerDropdown v-if="showPlayerDropdown" @start-distribution="startRoleDistribution"/>
-        <RoleAllocationButtons :gameId="gameId" :listPlayers="listPlayers"
-        v-if="showRoleAllocationButtons" @show-game="showGame"/>
-        <GameComponent :listPlayers="listPlayers" v-if="showGameComponent"/>
+      <button class="start-game-button" v-if="showBtnStartGame" @click="startQuickGame">Create a quick game</button>
+      <div class="main-content">
+        <PlayerDropdown v-if="showPlayerDropdown" @start-distribution="startRoleDistribution" />
+        <RoleAllocationButtons v-if="showRoleAllocationButtons" @show-game="showGame" />
+        <GameComponent v-if="showGameComponent" />
       </div>
     </div>
   </main>
@@ -21,6 +21,7 @@ import RoleAllocationButtons from './components/RoleAllocationButtons.vue';
 import PlayerDropdown from './components/PlayerDropdown.vue';
 import GameComponent from './components/GameComponent.vue';
 import { ApiClient } from '@domain/api-client.js';
+import { StatusEnum } from '@/constants/enums.js';
 
 export default {
   components: {
@@ -35,34 +36,47 @@ export default {
       showPlayerDropdown: false,
       showRoleAllocationButtons: false,
       showGameComponent: false,
-      listPlayers: [],
       currentPlayerIndex: 0,
-      api: new ApiClient(),
-      gameId: null
+      api: new ApiClient()
     };
   },
 
   methods: {
-    async startGame() {
+    startQuickGame() {
       try {
-        const response = await this.api.postGame();
-        this.gameId = response.id;
+        const players = Array.from({ length: 10 }, (_, i) => ({
+          id: i + 1,
+          status: StatusEnum.ALIVE,
+          fouls: 0
+        }));
+        this.$store.commit('setPlayers', [...players]);
+        this.$store.commit('setAnonymousGame', true);
         this.showBtnStartGame = false;
-        this.showPlayerDropdown = true;
-        console.log('Game created with ID:', this.gameId);
+        this.showRoleAllocationButtons = true;
       } catch (error) {
-        console.error('Error creating game:', error);
         alert('Error creating game');
       }
     },
+
+    async startGame() {
+      try {
+        const response = await this.api.postGame();
+        this.$store.commit('setGameId', response.id);
+        this.showBtnStartGame = false;
+        this.showPlayerDropdown = true;
+      } catch (error) {
+        alert('Error creating game');
+      }
+    },
+
     startRoleDistribution(players) {
-      this.listPlayers = [...players];
+      this.$store.commit('setPlayers', [...players]);
       this.currentPlayerIndex = 0;
       this.showPlayerDropdown = false;
       this.showRoleAllocationButtons = true;
     },
-    showGame(players) {    
-      this.listPlayers = [...players];
+
+    showGame() {
       this.showRoleAllocationButtons = false;
       this.showGameComponent = true;
     }
@@ -70,9 +84,11 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use "@/assets/styles/colors" as *;
+
 .mafia-header {
-  background-color: #dc2a0b;
+  background-color: $red;
   color: white;
   text-align: center;
   padding: 10px 0;
@@ -81,7 +97,7 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   font-size: 18px;
   font-weight: bold;
@@ -95,18 +111,19 @@ export default {
 }
 
 .start-game-button {
-  background-color: #dc2a0b;
+  background-color: $red;
   color: white;
   cursor: pointer;
   font-size: 24px;
   padding: 15px;
+  margin: 10px;
   border-radius: 5px;
   border: none;
-  transition: background-color .3s ease, transform .3s ease; 
+  transition: background-color .3s ease, transform .3s ease;
 }
 
 .start-game-button:hover {
-   background-color: #b22424;
+  background-color: $dark-red;
 }
 
 .main-content {

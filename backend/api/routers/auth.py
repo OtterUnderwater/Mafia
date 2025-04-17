@@ -6,7 +6,6 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
 from sqlalchemy import select
 
-from api.config import settings
 from api.schemas import UserSchema, TokenInfo
 from api.routers import utils
 from db.database import async_session_maker

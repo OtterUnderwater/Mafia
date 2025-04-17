@@ -1,3 +1,6 @@
+import asyncpg
+
+from fastapi import HTTPException
 from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine

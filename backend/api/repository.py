@@ -53,3 +53,4 @@ class SQLAlchemyRepository(AbstractRepository):
             res = await session.execute(stmt)
             await session.commit()
             return res.scalar_one()
+

@@ -1,13 +1,13 @@
 import jwt
 import bcrypt
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from api.config import settings
 
 def encode_jwt(payload: dict, private_key_path: Path = settings.auth_jwt.private_key_path, algorithm: str = settings.auth_jwt.algorithm):
     to_encode = payload.copy()
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     expire = now + timedelta(days=365)
     to_encode.update(
         exp=expire,

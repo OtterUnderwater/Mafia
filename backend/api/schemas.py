@@ -1,7 +1,5 @@
 from pydantic import BaseModel, EmailStr, ConfigDict, Field
-
 from db.sql_enums import StatusEnum, RoleEnum, EliminationReasonEnum
-
 
 class UserSchema(BaseModel):
     model_config = ConfigDict(strict=True)
@@ -36,4 +34,3 @@ class PlayerStatusUpdateSchema(BaseModel):
     fouls: int | None = None
     status: StatusEnum | None = None
     elimination_reason: EliminationReasonEnum | None = None
-

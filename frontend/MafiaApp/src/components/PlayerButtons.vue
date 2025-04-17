@@ -1,49 +1,47 @@
 <template>
-  <div v-if="listPlayers.length" class="buttons-grid">
+  <div v-if="players.length" class="buttons-grid">
     <div class="column">
       <div v-for="(item, index) in firstColumn" :key="index">
-        <ButtonPlayer :item="item" :index="index" :currentRole="currentRole" @show-player="showPlayer" />
+        <ButtonPlayer :item="item" :index="index" :idStage="idStage" @show-player="showPlayer"/>
       </div>
     </div>
     <div class="column">
       <div v-for="(item, index) in secondColumn" :key="index">
-        <ButtonPlayer :item="item" :index="index + 5" :currentRole="currentRole" @show-player="showPlayer" />
+        <ButtonPlayer :item="item" :index="index + 5" :idStage="idStage" @show-player="showPlayer"/>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import ButtonPlayer from './ButtonPlayer.vue';
+import ButtonPlayer from './items/ButtonPlayer.vue';
+import { mapState } from 'vuex';
 
 export default {
   components: {
     ButtonPlayer
   },
-
   props: {
-     listPlayers: {
-      type: Array,
+    idStage: {
+      type: Number,
       required: true
     },
-    currentRole: {
-      type: String,
-      default: null,
-    },
-  },
-
+  }, 
   computed: {
+    ...mapState({
+      players: state => state.players
+    }),
     firstColumn() {
-      return this.listPlayers.slice(0, 5);
+      return this.players.slice(0, 5);
     },
     secondColumn() {
-      return this.listPlayers.slice(5);
+      return this.players.slice(5);
     },
   },
-
   methods: {
     showPlayer(index) {
-      this.listPlayers[index].showNickname = !this.listPlayers[index].showNickname;
+      this.$store.commit('updatePlayer',
+      { index: index, property: 'showNickname', value: !this.$store.state.players[index].showNickname });
     }
   }
 };

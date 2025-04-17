@@ -28,6 +28,7 @@ export default {
 .button-role {
   background-color: white;
   color: black;
+  border-radius: 4px;
   border: 1px solid black;
   padding: 10px;
   cursor: pointer;

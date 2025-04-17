@@ -56,8 +56,3 @@ async def register_new_player(player: PlayerSchema):
 @router.get("")
 async def get_players(service: Annotated[PlayerService, Depends(player_service)]):
     return await service.get_players()
-
-@router.get("/player_status")
-async def get_status_player(new_player: PlayerSchema, service: Annotated[PlayerService, Depends(player_service)]):
-    player = await service.add_player(new_player)
-    return {"ок": True, "id": player.id}

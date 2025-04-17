@@ -18,7 +18,7 @@ class PlayerStatusService:
 
     async def update_players_status(self, id: int, player_status: PlayerStatusUpdateSchema):
         try:
-            data = player_status.dict(exclude_unset=True)
+            data = player_status.model_dump(exclude_unset=True)
             return await self.player_status_repo.update_one(id, data)
         except DataError as e:
             if 'invalid input value for enum' in str(e).lower():

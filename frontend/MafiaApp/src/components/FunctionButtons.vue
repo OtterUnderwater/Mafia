@@ -26,6 +26,7 @@
 
 <script>
 import { StatusEnum, EliminationReasonEnum, RoleEnum } from '@/constants/enums.js';
+import { ApiClient } from '@domain/api-client.js';
 import { mapState } from 'vuex';
 
 export default {
@@ -40,6 +41,7 @@ export default {
     return {
       showActionPopup: false,
       showPopupVictory: false,
+      api: new ApiClient(),
       victory: null,
       currentAction: null
     };
@@ -87,7 +89,7 @@ export default {
       this.victory = role;
       this.showPopupVictory = true;
     },
-    performAction(action, index) {
+    async performAction(action, index) {
       switch (action) {
         case 'killed':
           this.$store.commit('updatePlayer', { index: index, property: 'status', value: StatusEnum.DEAD });
@@ -95,7 +97,7 @@ export default {
           break;
         case 'awardFoul':
           this.$store.commit('updatePlayer', { index: index, property: 'fouls', value: this.players[index].fouls + 1 });
-          if (this.players[index].fouls >= 3) {
+          if (this.players[index].fouls >= 4) {
             this.$store.commit('updatePlayer', { index: index, property: 'status', value: StatusEnum.DEAD });
             this.$store.commit('updatePlayer', { index: index, property: 'elimination_reason', value: EliminationReasonEnum.DELETED });
           }
@@ -116,8 +118,33 @@ export default {
           else
             countCivilian++;
       }
-      if(countMafia <= 0) this.victoryRole(RoleEnum.CIVILIAN);
-      if(countCivilian < countMafia) this.victoryRole(RoleEnum.MAFIA);  
+      if(countMafia <= 0) 
+      {
+        this.victoryRole(RoleEnum.CIVILIAN);
+        if (!this.$store.state.anonymousGame)
+          await this.updatePlayerStatus();
+      }
+      else if(countCivilian < countMafia)
+       {
+        this.victoryRole(RoleEnum.MAFIA); 
+        if (!this.$store.state.anonymousGame)
+          await this.updatePlayerStatus();
+      }
+    },
+    async updatePlayerStatus() {
+      try {
+        for (let i = 0; i < this.$store.state.players.length; i++) {
+          await this.api.updatePlayerStatus(
+            this.$store.state.players[i].idPS,
+            this.$store.state.players[i].fouls,
+            this.$store.state.players[i].status,
+            this.$store.state.players[i].elimination_reason
+          );
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert(error);
+      }
     },
   }
 };

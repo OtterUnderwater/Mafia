@@ -52,5 +52,18 @@ export class ApiClient {
     }
   }
 
-  
+  async updatePlayerStatus(id, fouls, status, elimination_reason) {
+    const requestBody = {
+      fouls: fouls,
+      status: status,
+      elimination_reason: elimination_reason
+    };
+    try {
+      const response = await this.instance.patch(`/player_status/${id}`, requestBody);
+      return response.data;
+    } catch (error) {
+      console.error('Error update player status:', error);
+      throw error;
+    }
+  }
 }

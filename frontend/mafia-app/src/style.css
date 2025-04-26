@@ -1,0 +1,47 @@
+:root {
+  font-family: Poppins, ui-sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;  /*light dark - только темная тема*/
+  color: #F2EFE6;
+  background-color: #07070B;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --background: #07070B;
+  --primary-red: #5F0E0D;
+  --text-white: #F2EFE6;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #5F0E0D;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+main {
+  margin-top: 60px;
+  padding: 1rem;
+  min-height: calc(100vh - 60px);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #07070B;
+}
+

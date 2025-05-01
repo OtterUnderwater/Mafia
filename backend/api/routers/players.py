@@ -22,20 +22,16 @@ from sqlalchemy import insert, select
 async def register_new_player(player: PlayerSchema):
     async with async_session_maker() as session:
         existing_player = await session.execute(
-            select(Player).where(
-                (Player.email == player.email) |
-                (Player.nickname == player.nickname)
-            )
+            select(Player).where(Player.nickname == player.nickname)
         )
         if existing_player.scalar_one_or_none():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Player with this email or nickname already exists"
+                detail="Player with this nickname already exists"
             )
         try:
             stmt = insert(Player).values(
                 nickname=player.nickname,
-                email=player.email,
                 password=utils.hash_password(player.password)
             ).returning(Player.id)
             result = await session.execute(stmt)

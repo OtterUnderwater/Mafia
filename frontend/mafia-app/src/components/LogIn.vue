@@ -3,9 +3,7 @@
 </script>
 
 <template>
-  <div>
-    <h1>GameRulesView</h1>
-  </div>
+  LogIn
 </template>
 
 <style scoped>

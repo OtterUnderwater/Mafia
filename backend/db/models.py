@@ -9,7 +9,6 @@ from db.sql_enums import RoleEnum, StatusEnum, EliminationReasonEnum
 class Player(Base):
     __tablename__ = 'player'
     nickname: Mapped[Optional[str]]
-    email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[bytes]
     player_status: Mapped[list["PlayerStatus"]] = relationship(
         "PlayerStatus",

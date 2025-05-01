@@ -13,7 +13,6 @@ class TokenInfo(BaseModel):
 
 class PlayerSchema(BaseModel):
     nickname: str = Field(max_length=100)
-    email: EmailStr
     password: str = Field(min_length=4, max_length=100)
 
 class GameSchema(BaseModel):

@@ -11,7 +11,6 @@ class PlayerService:
     async def add_player(self, player: PlayerSchema):
         new_player = Player(
             nickname = player.nickname,
-            email = player.email,
             password = utils.hash_password(player.password)
         )
         return await self.player_repo.add_one(new_player)

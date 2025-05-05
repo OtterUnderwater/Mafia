@@ -9,9 +9,14 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppBar: typeof import('./components/AppBar.vue')['default']
+    ClockArea: typeof import('./components/ClockArea.vue')['default']
+    FunctionButtons: typeof import('./components/FunctionButtons.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
+    InfoStageArea: typeof import('./components/InfoStageArea.vue')['default']
     LogIn: typeof import('./components/LogIn.vue')['default']
     PlayerCard: typeof import('./components/PlayerCard.vue')['default']
+    PlayerNicknameForm: typeof import('./components/PlayerNicknameForm.vue')['default']
+    RoleSelection: typeof import('./components/RoleSelection.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SignUp: typeof import('./components/SignUp.vue')['default']

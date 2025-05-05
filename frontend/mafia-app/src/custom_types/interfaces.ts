@@ -4,8 +4,8 @@ export interface Player {
   id: number;
   nickname: string;
   fouls: number;
-  role: typeof RoleEnum;
-  status: typeof StatusEnum;
-  elimination_reason: typeof EliminationReasonEnum;
+  role: RoleEnum | null;
+  status: StatusEnum;
+  elimination_reason: EliminationReasonEnum | null;
   show_role: boolean;
 }

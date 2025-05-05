@@ -1,17 +1,17 @@
-export const RoleEnum = Object.freeze({
-  CIVILIAN: 'Civilian',
-  MAFIA: 'Mafia',
-  DON: 'Don',
-  SHERIFF: 'Sheriff',
-});
+export enum RoleEnum {
+  Civilian = 'Civilian',
+  Mafia = 'Mafia',
+  Don = 'Don',
+  Sheriff = 'Sheriff'
+}
 
-export const StatusEnum = Object.freeze({
-  ALIVE: 'alive',
-  DEAD: 'dead',
-});
+export enum StatusEnum {
+  Alive = 'alive',
+  Dead = 'dead'
+}
 
-export const EliminationReasonEnum = Object.freeze({
-  VOTED: 'voted',
-  KILLED: 'killed',
-  DELETED: 'deleted',
-});
+export enum EliminationReasonEnum {
+  Voted = 'voted',
+  Killed = 'killed',
+  Deleted = 'deleted'
+}

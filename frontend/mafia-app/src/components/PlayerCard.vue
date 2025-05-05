@@ -1,58 +1,67 @@
 <template>
+  <v-card
+    class="pa-4 text-white mx-auto"
+    color="#99948E"
+    rounded
+  >
+    <v-card
+      class="pa-4 text-white mx-auto"
+      color="#161819"
+      max-width="170"
+      rounded
+    >
+      <h4 class="text-h5 font-weight-bold mb-4 text-center">Player №{{ player.id }}</h4>
 
-  {{ players.length }}
-<!--  <v-sheet-->
-<!--      border="info md"-->
-<!--      class="pa-6 text-white mx-auto"-->
-<!--      color="#141518"-->
-<!--      max-width="400"-->
-<!--      rounded-->
-<!--    >-->
-<!--    <v-sheet-->
-<!--      class="pa-1 mx-auto text-center bg-transparent"-->
-<!--      max-width="200"-->
-<!--      rounded="lg"-->
-<!--      border="md opacity-100 double accent"-->
-<!--    >-->
-<!--      <h4 class="font-weight-bold text-accent">ROLE</h4>-->
-<!--    </v-sheet>-->
+      <v-card
+        :border="`md opacity-100 double ${isMafiaRole ? 'accent' : 'tooltip'}`"
+        class="pa-1 text-center bg-transparent"
+        max-width="130"
+        rounded="lg"
+      >
+        <h4 class="font-weight-bold" :class="isMafiaRole ? 'text-accent' : 'text-tooltip'">{{ player.role }}</h4>
+      </v-card>
 
-<!--    <v-sheet-->
-<!--      class="pa-1 mx-auto text-center bg-transparent border-tooltip border-opacity-100 border-double"-->
-<!--      max-width="200"-->
-<!--      rounded="lg"-->
-<!--      border="md"-->
-<!--    >-->
-<!--      <h4 class="font-weight-bold text-tooltip">ROLE</h4>-->
-<!--    </v-sheet>-->
+      <p class="mt-4 mb-2 text-tooltip">
+        {{ player.nickname }}
+      </p>
 
-<!--      <h4 class="text-h5 font-weight-bold mb-4">Your Privacy</h4>-->
-
-<!--      <p class="mb-8">-->
-<!--        This business determines the use of personal data collected on our media properties and across the internet. We may collect data that you submit to us directly or data that we collect automatically including from cookies (such as device information or IP address).-->
-
-<!--        <br>-->
-<!--        <br>-->
-
-<!--        Please read our <a class="text-red-accent-2" href="#">Privacy Policy</a> to learn about our privacy practices or click "Your Preferences" to exercise control over your data.-->
-<!--      </p>-->
-
-<!--      <v-btn-->
-<!--        class="text-none text-black"-->
-<!--        color="red-accent-2"-->
-<!--        size="x-large"-->
-<!--        variant="outlined"-->
-<!--      >-->
-<!--        Your Preferences-->
-<!--      </v-btn>-->
-
-<!--  </v-sheet>-->
+      <p class="mb-4 text-tooltip">
+        {{ player.status }}
+      </p>
+      {{ player.fouls }}
+      <v-row class="pa-0 ma-0" justify="space-between" align="center" style="width: 100%">
+        <v-col
+          v-for="n in 4"
+          :key="n"
+          cols="3"
+          class="pa-0"
+          style="text-align: center"
+        >
+          <v-icon
+            :color="n <= player.fouls ? 'accent' : 'tooltip'"
+            small
+          >
+            mdi-circle
+          </v-icon>
+        </v-col>
+      </v-row>
+    </v-card>
+  </v-card>
 </template>
 
 <script setup lang="ts">
-  import { useAppStore } from '@/stores/app.ts';
-  import { computed } from 'vue';
+  import type { Player } from '@/custom_types/interfaces.ts';
+  import { RoleEnum } from '@/custom_types/enums.ts';
 
-  const store = useAppStore();
-  const players = computed(() => store.players);
+  const props = defineProps<{
+    player: Player
+  }>();
+
+  // const playerFouls = computed(() => {
+  //   props.player.fouls
+  // });
+
+  const isMafiaRole = computed(() => {
+    return props.player.role === RoleEnum.Mafia || props.player.role === RoleEnum.Don;
+  });
 </script>

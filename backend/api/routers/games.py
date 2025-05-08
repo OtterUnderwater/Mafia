@@ -12,11 +12,11 @@ router = APIRouter(
      responses={404: {"description": "Not found"}},
 )
 
+@router.get("")
+async def get_games(service: Annotated[GameService, Depends(game_service)]):
+    return await service.get_games()
+
 @router.post("/game")
 async def add_game(new_game: GameSchema, service: Annotated[GameService, Depends(game_service)]):
     game = await service.add_game(new_game)
     return {"ок": True, "id": game.id}
-
-@router.get("")
-async def get_games(service: Annotated[GameService, Depends(game_service)]):
-    return await service.get_games()

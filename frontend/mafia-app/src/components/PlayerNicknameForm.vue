@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title class="d-flex justify-center pa-4">
-      <h3 class="text-h5 text-center">
+      <h3 class="text-h5 text-center text-wrap">
         Start the game without registration
       </h3>
     </v-card-title>

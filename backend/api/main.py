@@ -13,15 +13,13 @@ app.include_router(player_status.router)
 app.include_router(games.router)
 
 origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    "http://localhost:8080",
-    "http://localhost:5173"
+    "http://localhost:3000",  # React / Next.js / Vite
+    "http://127.0.0.1:3000",   # Альтернативный адрес фронтенда
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

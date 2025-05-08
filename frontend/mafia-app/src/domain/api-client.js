@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAppStore } from '@/stores/app';
 
 export class ApiClient {
   constructor () {
@@ -9,7 +10,61 @@ export class ApiClient {
       headers: {
         'Content-Type': 'application/json',
       },
+      withCredentials: true,
     });
+  }
+  //   fetch('/api/protected', {
+  //   headers: {
+  //     'Authorization': `Bearer ${accessToken}`
+  //   }
+  // })
+  async postAuthorization (username, password) {
+    try {
+      const formData = new FormData();
+      formData.append('username', username);
+      formData.append('password', password);
+      const response = await this.instance.post('/jwt/login', formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
+      const { access_token } = response.data;
+      const store = useAppStore();
+      store.setAccessToken(access_token);
+      return response.data;
+    } catch (error) {
+      alert(`Error authorization user: ${error}`);
+      console.error('Error authorization user:', error);
+      throw error;
+    }
+  }
+
+  async updateToken () {
+    try {
+      const response = await this.instance.post('/jwt/refresh');
+      const { access_token } = response.data;
+      const store = useAppStore();
+      store.setAccessToken(access_token);
+      return response.data;
+    } catch (error) {
+      alert(`Error update tokens: ${error}`);
+      console.error('Error update tokens:', error);
+      throw error;
+    }
+  }
+
+  async postRegistration (username, password) {
+    try {
+      const requestBody = {
+        username,
+        password,
+      };
+      const response = await this.instance.post('/players/registration', requestBody);
+      return response.data;
+    } catch (error) {
+      console.error('Error registration user:', error);
+      throw error;
+    }
   }
 
   async getPlayers () {

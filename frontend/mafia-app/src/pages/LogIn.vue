@@ -53,6 +53,9 @@
   import { computed, reactive, ref } from 'vue';
   import { useVuelidate } from '@vuelidate/core';
   import { required } from '@vuelidate/validators';
+  import { ApiClient } from '@/domain/api-client.js';
+
+  const api = new ApiClient();
 
   const initialState = {
     nickname: '',
@@ -63,8 +66,8 @@
   const passwordVisible = ref(false);
 
   const rules = computed(() => ({
-    nickname: {required},
-    password: {required},
+    nickname: { required },
+    password: { required },
   }));
 
   const v$ = useVuelidate(rules, state);
@@ -72,9 +75,18 @@
   const handleSubmit = async () => {
     const isValid = await v$.value.$validate();
     if (isValid) {
-      // Submit logic
+      await authorization();
     }
   };
+
+  async function authorization () {
+    try {
+      await api.postAuthorization(state.nickname, state.password);
+    }
+    catch (error) {
+      alert(`Error authorization: ${error}`);
+    }
+  }
 
   function togglePasswordVisibility () {
     passwordVisible.value = !passwordVisible.value;

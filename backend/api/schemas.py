@@ -9,7 +9,7 @@ class UserSchema(BaseModel):
 
 class TokenInfo(BaseModel):
     access_token: str
-    token_type: str
+    token_type: str = "Bearer"
 
 class PlayerSchema(BaseModel):
     nickname: str = Field(max_length=100)
@@ -19,7 +19,6 @@ class GameSchema(BaseModel):
     id_master: int
 
 class PlayerStatusSchema(BaseModel):
-    id_player: int
     id_game: int
     role: RoleEnum | None = None
     fouls: int | None = 0

@@ -42,6 +42,12 @@ class SQLAlchemyRepository(AbstractRepository):
            res = await session.execute(stmt)
            return res.scalars().all()
 
+    async def get_by_game_id(self, id_game: int):
+        async with async_session_maker() as session:
+            stmt = select(self.model).where(self.model.id_game == id_game)
+            result = await session.execute(stmt)
+            return result.scalars().all()
+
     async def update_one(self, id: int, data: dict):
         async with async_session_maker() as session:
             stmt = (

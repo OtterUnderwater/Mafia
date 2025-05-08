@@ -1,5 +1,5 @@
 from api.repository import AbstractRepository
-from api.routers import utils
+from api.routers.auth_metods import utils
 from api.schemas import PlayerSchema
 from db.models import Player
 

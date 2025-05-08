@@ -72,6 +72,7 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@ct': fileURLToPath(new URL('./src/custom_types', import.meta.url)),
+      '@domain': fileURLToPath(new URL('./src/domain', import.meta.url)),
     },
     extensions: [
       '.js',

@@ -1,91 +1,15 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
-from fastapi import Form, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jwt import InvalidTokenError
-from sqlalchemy import select
+from fastapi import APIRouter, Response, Request, HTTPException, status
+from fastapi.params import Depends
 
-from api.schemas import UserSchema, TokenInfo
-from api.routers import utils
-from db.database import async_session_maker
+from api.routers.auth_metods.helpers import create_access_token, create_refresh_token
+from api.routers.auth_metods.validation import get_current_auth_user_for_refresh, get_current_auth_user, \
+    validate_auth_user, http_bearer, get_current_token
+from api.schemas import TokenInfo
 from db.models import Player
 
-router = APIRouter(prefix="/jwt", tags=["JWT"])
-
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/jwt/login",
-)
-
-async def validate_auth_user(
-     username: Annotated[str, Form()],
-     password: Annotated[str, Form()]
-):
-    async with async_session_maker() as session:
-        unauthed_exc = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="invalid username or password",
-        )
-        result = await session.execute(
-            select(Player).where(Player.nickname == username)
-        )
-        user = result.scalar_one_or_none()
-        if not user:
-            raise unauthed_exc
-        if not utils.validate_password(
-                password=password,
-                hashed_password=user.password,
-        ):
-            raise unauthed_exc
-        return user
-
-@router.post("/login", response_model=TokenInfo)
-async def auth_user_issue_jwt(
-    user: Annotated[Player, Depends(validate_auth_user)],
-):
-    jwt_payload = {
-        "sub": str(user.id),
-        "username": user.nickname,
-        "email": user.email
-    }
-    token = utils.encode_jwt(jwt_payload)
-    return TokenInfo(
-        access_token=token,
-        token_type="Bearer"
-    )
-
-async def get_current_token(
-    token: Annotated[str, Depends(oauth2_scheme)],
-) -> dict:
-    try:
-        payload = utils.decode_jwt(token)
-    except InvalidTokenError as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"invalid token error: {e}"
-        )
-    return payload
-
-async def get_current_auth_user(
-    payload: Annotated[dict, Depends(get_current_token)]
-) -> Player:
-    async with async_session_maker() as session:
-        user_id: str | None = payload.get("sub")
-        if not user_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token format",
-            )
-        result = await session.execute(
-            select(Player).where(Player.id == int(user_id))
-        )
-        user = result.scalar_one_or_none()
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not found",
-            )
-        return user
+router = APIRouter(prefix="/jwt", tags=["JWT"], dependencies=[Depends(http_bearer)])
 
 @router.get("/current_user")
 async def auth_user_check_self_info(
@@ -93,5 +17,58 @@ async def auth_user_check_self_info(
 ):
     return {
         "username": user.nickname,
-        "email": user.email,
     }
+
+@router.post("/login", response_model=TokenInfo)
+async def auth_user_issue_jwt(
+    response: Response,
+    user: Annotated[Player, Depends(validate_auth_user)],
+):
+    access_token = create_access_token(user)
+    refresh_token = create_refresh_token(user)
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        samesite="none",
+        secure=True,
+        httponly=True,
+        max_age=(30 * 24 * 60 * 60),
+    )
+    return TokenInfo(access_token=access_token)
+
+# @router.post("/refresh", response_model=TokenInfo)
+# async def auth_refresh_jwt(
+#     user: Annotated[Player, Depends(get_current_auth_user_for_refresh)],
+# ):
+#    access_token = create_access_token(user)
+#    refresh_token = create_refresh_token(user)
+#    return TokenInfo(
+#        access_token=access_token,
+#        refresh_token=refresh_token,
+#    )
+
+
+@router.post("/refresh", response_model=TokenInfo)
+async def auth_refresh_jwt(
+        request: Request,
+        response: Response,
+):
+    refresh_token = request.cookies.get("refresh_token")
+    if not refresh_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Refresh token is missing"
+        )
+    payload = await get_current_token(refresh_token)
+    user = await get_current_auth_user_for_refresh(payload)
+    new_access_token = create_access_token(user)
+    new_refresh_token = create_refresh_token(user)
+    response.set_cookie(
+        key="refresh_token",
+        value=new_refresh_token,
+        samesite="none",
+        secure=True,
+        httponly=True,
+        max_age=(30 * 24 * 60 * 60),
+    )
+    return TokenInfo(access_token=new_access_token)

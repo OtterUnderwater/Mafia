@@ -8,6 +8,7 @@ export const useAppStore = defineStore('app', {
     gameId: 0 as number,
     anonymousGame: false as boolean,
     isHost: false as boolean,
+    access_token: '' as string,
     players: Array.from({ length: 10 }, (_, index) => ({
       id: index + 1,
       nickname: '',
@@ -19,6 +20,9 @@ export const useAppStore = defineStore('app', {
     } as Player)),
   }),
   actions: {
+    setAccessToken (access_token: string) {
+      this.access_token = access_token;
+    },
     setGameId (gameId: number) {
       this.gameId = gameId;
     },
@@ -28,7 +32,7 @@ export const useAppStore = defineStore('app', {
     setPlayers (players: Player[]) {
       this.players = players;
     },
-    updatePlayer ({ index, property, value }: { index: number; property: keyof Player; value: never }) {
+    updatePlayer ({ index, property, value }: { index: number; property: keyof Player; value: any }) {
       if (this.players[index]) {
         this.players[index][property] = value;
       }

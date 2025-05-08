@@ -1,11 +1,11 @@
-from typing import Annotated, List
+from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
 
 from db.database import async_session_maker
 from db.models import Player
-from . import utils
-from ..dependencies import SessionDep, player_service
+from .auth_metods import utils
+from ..dependencies import player_service
 from ..schemas import PlayerSchema
 from ..services.players import PlayerService
 
@@ -15,8 +15,12 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status
 from sqlalchemy import insert, select
+
+@router.get("")
+async def get_players(service: Annotated[PlayerService, Depends(player_service)]):
+    return await service.get_players()
 
 @router.post("/registration", status_code=status.HTTP_201_CREATED)
 async def register_new_player(player: PlayerSchema):
@@ -48,7 +52,3 @@ async def register_new_player(player: PlayerSchema):
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error registering player"
             )
-
-@router.get("")
-async def get_players(service: Annotated[PlayerService, Depends(player_service)]):
-    return await service.get_players()

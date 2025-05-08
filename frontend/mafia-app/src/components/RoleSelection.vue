@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-title class="d-flex flex-wrap">
+    <v-card-title class="d-flex flex-wrap text-wrap">
       Select Roles Mode
     </v-card-title>
     <v-card-text>

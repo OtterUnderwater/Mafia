@@ -62,7 +62,10 @@
   import { computed, reactive, ref } from 'vue';
   import { useVuelidate } from '@vuelidate/core';
   import { helpers, required, sameAs } from '@vuelidate/validators';
+  import { ApiClient } from '@/domain/api-client.js';
+  import { useRouter } from "vue-router";
 
+  const api = new ApiClient();
   const initialState = {
     nickname: '',
     password: '',
@@ -87,12 +90,23 @@
 
   const v$ = useVuelidate(rules, state);
 
+  const router = useRouter();
   const handleSubmit = async () => {
     const isValid = await v$.value.$validate();
     if (isValid) {
-      // Submit logic
+      await registration();
+      router.push('/LogIn')
     }
   };
+
+  async function registration () {
+    try {
+      await api.postRegistration(state.nickname, state.password);
+    }
+    catch (error) {
+      alert(`Error registration: ${error}`);
+    }
+  }
 
   function togglePasswordVisibility () {
     passwordVisible.value = !passwordVisible.value;

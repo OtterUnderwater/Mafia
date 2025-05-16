@@ -1,6 +1,6 @@
 <template>
   <v-card
-    class="mx-auto pa-8 pb-8"
+    class="mx-auto pa-8 pb-8 mt-8"
     elevation="8"
     max-width="448"
     rounded="lg"
@@ -95,7 +95,7 @@
     const isValid = await v$.value.$validate();
     if (isValid) {
       await registration();
-      router.push('/LogIn')
+      await router.push('/LogIn')
     }
   };
 

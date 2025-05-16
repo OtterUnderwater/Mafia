@@ -1,17 +1,16 @@
 from collections import defaultdict
 
-from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Depends
+from fastapi import WebSocket, WebSocketDisconnect, APIRouter, status, Depends
 from typing import Dict, Set, Annotated
 
-from api.routers.auth_metods.validation import http_bearer, get_current_auth_user
+from api.schemas import PlayerStatusSchema
 from api.services.player_status import PlayerStatusService
-from db.models import Player
+from api.services.players import PlayerService
 
 router = APIRouter(
     prefix="/web_socket",
     tags=["Web_socket"],
-    responses={404: {"description": "Not found"}},
-    dependencies=[Depends(http_bearer)]
+    responses={404: {"description": "Not found"}}
 )
 
 class ConnectionManager:
@@ -34,19 +33,36 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-async def broadcast_update(service: PlayerStatusService, game_id: int):
-    updated_data = await service.get_players_status(game_id)
-    await manager.broadcast(game_id, {"type": "status_update", "data": updated_data})
+async def broadcast_add(game_id: int, service: PlayerStatusService, service_player: PlayerService):
+    try:
+        updated_data = await service.get_players_status(game_id, service_player)
+        serialized_data = [PlayerStatusSchema.from_orm(player_status).model_dump() for player_status in updated_data]
+        await manager.broadcast(game_id, {"type": "add", "data": serialized_data})
+    except Exception as e:
+        print(f"Broadcast error: {e}")
+
+
+async def broadcast_update(game_id: int, id: int, service: PlayerStatusService, service_player: PlayerService):
+    try:
+        updated_data = await service.get_player_status(id, service_player)
+        serialized_data = PlayerStatusSchema.from_orm(updated_data).model_dump()
+        await manager.broadcast(game_id, {"type": "update", "data": serialized_data})
+    except Exception as e:
+        print(f"Broadcast error: {e}")
+
 
 @router.websocket("/updates_game/{game_id}")
-async def websocket_endpoint(websocket: WebSocket, game_id: int, user: Annotated[Player, Depends(get_current_auth_user)]):
-    if not user:
-        await websocket.close(code=4001)
+async def websocket_endpoint(websocket: WebSocket, game_id: int):
+    try:
+        await manager.connect(websocket, game_id)
+    except Exception as e:
+        print(f"Connection manager error: {e}")
+        await websocket.close(code=status.WS_1011_INTERNAL_ERROR)
         return
-    await manager.connect(websocket, game_id)
     try:
         while True:
-            await websocket.receive_text()
+            data = await websocket.receive_text()
     except WebSocketDisconnect:
-        manager.disconnect(websocket, game_id)
-
+        print("Client disconnected normally")
+    except Exception as e:
+        print(f"Unexpected error: {e}")

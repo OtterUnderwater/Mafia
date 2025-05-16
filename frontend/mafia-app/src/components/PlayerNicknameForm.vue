@@ -51,14 +51,16 @@
 <script setup lang="ts">
   import { useAppStore } from '@/stores/app.js';
   import { computed, ref } from 'vue';
+  import { useRouter } from 'vue-router';
 
   const formValid = ref(false);
-  const emit = defineEmits(['start-game']);
   const store = useAppStore();
   const players = computed(() => store.players);
 
+  const router = useRouter()
+
   const handleStartGame = () => {
     store.setPlayers(players.value);
-    emit('start-game');
+    router.push('/RoleSelection');
   };
 </script>

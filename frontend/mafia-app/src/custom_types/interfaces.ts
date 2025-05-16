@@ -8,4 +8,5 @@ export interface Player {
   status: StatusEnum;
   elimination_reason: EliminationReasonEnum | null;
   show_role: boolean;
+  idPS: number;
 }

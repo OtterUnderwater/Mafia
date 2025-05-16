@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="flex-grow-1 pa-0 ma-0 h-100">
     <v-row class="function-buttons">
       <v-col>
         <v-btn block class="mb-2 my-4" color="primary" @click="togglePause">
@@ -47,13 +47,15 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
   </v-container>
 </template>
 
 <script setup lang="ts">
   import { useAppStore } from '@/stores/app';
-  import { defineProps } from "vue";
-  import { EliminationReasonEnum, RoleEnum, StatusEnum } from "@/custom_types/enums.ts";
+  import { defineProps } from 'vue';
+  import { EliminationReasonEnum, RoleEnum, StatusEnum, ResultEnum } from '@/custom_types/enums.ts';
+  import { ApiClient } from '@/domain/api-client';
 
   const props = defineProps<{
     isPaused: boolean;
@@ -69,11 +71,11 @@
 
   const showActionPopup = ref(false);
   const showPopupVictory = ref(false);
-  const victory = null;
+  const victory = ref('');
   const currentAction = ref('');
 
   const alivePlayers = computed(() => {
-    return players.value.filter((player) => player.status === StatusEnum.Alive);
+    return players.value.filter(player => player.status === StatusEnum.Alive);
   });
 
   const popupTitle = computed(() =>{
@@ -98,21 +100,22 @@
   };
 
   const openActionPopup = (action: string) => {
-    currentAction.value= action;
+    currentAction.value = action;
     showActionPopup.value = true;
   };
 
   const closeActionPopup = () => {
     showActionPopup.value = false;
-    currentAction.value= null;
+    currentAction.value= '';
   };
 
-  const victoryRole = (role) => {
+  const victoryRole = role => {
     victory.value = role;
     showPopupVictory.value = true;
   };
 
-  const performAction = (action: string, index: number) => {
+  const api = new ApiClient();
+  const performAction = async (action: string, index: number) => {
     switch (action) {
       case 'killed':
         store.updatePlayer({ index, property: 'status', value: StatusEnum.Dead });
@@ -131,6 +134,15 @@
         break;
       default: break;
     }
+    if (store.access_token !== '') {
+      await api.updatePlayerStatus(
+        players.value[index].idPS,
+        null,
+        players.value[index].fouls,
+        players.value[index].status,
+        players.value[index].elimination_reason,
+      );
+    }
     closeActionPopup();
     let countMafia = 0;
     let countCivilian = 0;
@@ -141,13 +153,13 @@
         else
           countCivilian++;
     }
-    if(countMafia <= 0)
-    {
+    if(countMafia <= 0) {
       victoryRole(RoleEnum.Civilian);
+      if (store.access_token !== '') await api.updateGame(ResultEnum.CiviliansWin);
     }
-    else if(countCivilian < countMafia)
-    {
+    else if(countCivilian < countMafia) {
       victoryRole(RoleEnum.Mafia);
+      if (store.access_token !== '') await api.updateGame(ResultEnum.MafiaWin);
     }
   };
 </script>

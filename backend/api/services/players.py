@@ -9,11 +9,12 @@ class PlayerService:
         self.player_repo: AbstractRepository = player_repo
 
     async def add_player(self, player: PlayerSchema):
-        new_player = Player(
-            nickname = player.nickname,
-            password = utils.hash_password(player.password)
-        )
-        return await self.player_repo.add_one(new_player)
+        data = {"nickname": player.nickname, "password": utils.hash_password(player.password)}
+        return await self.player_repo.add_one(data)
+
+    async def get_player(self, id: int):
+        data = {"id": id}
+        return await self.player_repo.get_one(data)
 
     async def get_players(self):
         return await self.player_repo.get_all()

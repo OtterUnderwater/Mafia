@@ -14,3 +14,8 @@ class EliminationReasonEnum(enum.StrEnum):
     VOTED = "voted"
     KILLED = "killed"
     DELETED = "deleted"
+
+class ResultEnum(enum.StrEnum):
+    MAFIA_WIN = "Mafia win"
+    CIVILIANS_WIN = "Civilians win"
+    NOT_DEFINED = "Not defined"

@@ -1,6 +1,6 @@
 <template>
   <v-card
-    class="mx-auto pa-8 pb-8"
+    class="mx-auto pa-8 pb-8 mt-8"
     elevation="8"
     max-width="448"
     rounded="lg"
@@ -54,8 +54,10 @@
   import { useVuelidate } from '@vuelidate/core';
   import { required } from '@vuelidate/validators';
   import { ApiClient } from '@/domain/api-client.js';
+  import {useRouter} from "vue-router";
 
   const api = new ApiClient();
+  const router = useRouter();
 
   const initialState = {
     nickname: '',
@@ -75,18 +77,13 @@
   const handleSubmit = async () => {
     const isValid = await v$.value.$validate();
     if (isValid) {
-      await authorization();
+      const isAuth = await api.postAuthorization(state.nickname, state.password);
+      if (!isAuth) {
+        await router.push('/SignUp');
+        alert('The user does not exist, please register.');
+      }
     }
   };
-
-  async function authorization () {
-    try {
-      await api.postAuthorization(state.nickname, state.password);
-    }
-    catch (error) {
-      alert(`Error authorization: ${error}`);
-    }
-  }
 
   function togglePasswordVisibility () {
     passwordVisible.value = !passwordVisible.value;

@@ -15,3 +15,9 @@ export enum EliminationReasonEnum {
   Killed = 'killed',
   Deleted = 'deleted'
 }
+
+export enum ResultEnum {
+  MafiaWin = 'Mafia win',
+  CiviliansWin = 'Civilians win',
+  NotDefined = 'Not defined'
+}

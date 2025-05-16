@@ -22,6 +22,10 @@ from sqlalchemy import insert, select
 async def get_players(service: Annotated[PlayerService, Depends(player_service)]):
     return await service.get_players()
 
+@router.get("/{id}")
+async def get_player(id: int, service: Annotated[PlayerService, Depends(player_service)]):
+    return await service.get_player(id)
+
 @router.post("/registration", status_code=status.HTTP_201_CREATED)
 async def register_new_player(player: PlayerSchema):
     async with async_session_maker() as session:

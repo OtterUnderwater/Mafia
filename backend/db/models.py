@@ -1,10 +1,11 @@
 from typing import Optional
 
-from sqlalchemy import ForeignKey, text
+from datetime import date
+from sqlalchemy import ForeignKey, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.database import Base
-from db.sql_enums import RoleEnum, StatusEnum, EliminationReasonEnum
+from db.sql_enums import RoleEnum, StatusEnum, EliminationReasonEnum, ResultEnum
 
 class Player(Base):
     __tablename__ = 'player'
@@ -22,6 +23,9 @@ class Game(Base):
         "PlayerStatus",
         back_populates="game"
     )
+    date: Mapped[date] = mapped_column(Date(), default=date.today)
+    result: Mapped[Optional[ResultEnum]]
+
 
 class PlayerStatus(Base):
     __tablename__ = 'player_status'
@@ -37,8 +41,10 @@ class PlayerStatus(Base):
         back_populates="player_status"
     )
     role: Mapped[Optional[RoleEnum]]
-    fouls: Mapped[Optional[int]]
-    status: Mapped[StatusEnum]  = mapped_column(
+    fouls: Mapped[Optional[int]] = mapped_column(
+        default=0
+    )
+    status: Mapped[StatusEnum] = mapped_column(
         default=StatusEnum.ALIVE
     )
     elimination_reason: Mapped[Optional[EliminationReasonEnum]]

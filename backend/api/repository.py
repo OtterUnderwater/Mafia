@@ -17,8 +17,17 @@ class AbstractRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_all_filters(self, data: dict):
+        raise NotImplementedError
+
+    @abstractmethod
     async def update_one(self, id: int, data: dict):
         raise NotImplementedError
+
+    @abstractmethod
+    async def delete_one(self, id: int):
+        raise NotImplementedError
+
 
 class SQLAlchemyRepository(AbstractRepository):
     model = None
@@ -42,11 +51,14 @@ class SQLAlchemyRepository(AbstractRepository):
            res = await session.execute(stmt)
            return res.scalars().all()
 
-    async def get_by_game_id(self, id_game: int):
+    async def get_all_filters(self, data: dict):
         async with async_session_maker() as session:
-            stmt = select(self.model).where(self.model.id_game == id_game)
-            result = await session.execute(stmt)
-            return result.scalars().all()
+            stmt = select(self.model)
+            for field, value in data.items():
+                if hasattr(self.model, field):
+                    stmt = stmt.where(getattr(self.model, field) == value)
+            res = await session.execute(stmt)
+            return res.scalars().all()
 
     async def update_one(self, id: int, data: dict):
         async with async_session_maker() as session:
@@ -60,3 +72,11 @@ class SQLAlchemyRepository(AbstractRepository):
             await session.commit()
             return res.scalar_one()
 
+    async def delete_one(self, id: int):
+        async with async_session_maker() as session:
+            obj_to_delete = await session.get(self.model, id)
+            if not obj_to_delete:
+                return None
+            await session.delete(obj_to_delete)
+            await session.commit()
+            return obj_to_delete

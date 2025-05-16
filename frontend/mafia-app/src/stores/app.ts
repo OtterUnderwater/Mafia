@@ -17,6 +17,7 @@ export const useAppStore = defineStore('app', {
       status: StatusEnum.Alive,
       elimination_reason: null,
       show_role: false,
+      idPS: 0,
     } as Player)),
   }),
   actions: {
@@ -36,6 +37,9 @@ export const useAppStore = defineStore('app', {
       if (this.players[index]) {
         this.players[index][property] = value;
       }
+    },
+    clearPlayers () {
+      this.players = [];
     },
   },
 })

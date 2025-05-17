@@ -82,6 +82,7 @@
         await router.push('/SignUp');
         alert('The user does not exist, please register.');
       }
+      else router.push('/');
     }
   };
 

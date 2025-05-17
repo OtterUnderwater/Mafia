@@ -28,7 +28,6 @@ export class WebSocketService {
             role: player.role || RoleEnum.Civilian,
             status: player.status === 'alive' ? StatusEnum.Alive : StatusEnum.Dead,
             elimination_reason: player.elimination_reason,
-            show_role: false,
             idPS: player.id,
           }));
           this.store.setPlayers(updatedPlayers);
@@ -45,11 +44,14 @@ export class WebSocketService {
               role: player.role || currentPlayers[playerIndex].role,
               status: player.status === 'alive' ? StatusEnum.Alive : StatusEnum.Dead,
               elimination_reason: player.elimination_reason || currentPlayers[playerIndex].elimination_reason,
-              show_role: currentPlayers[playerIndex].show_role,
               idPS: player.id,
             };
             this.store.setPlayers(currentPlayers);
           }
+        }
+        if (message.type === 'update_game' && !this.store.isHost) {
+          const game = message.data;
+          this.store.navigateTo(game.activity);
         }
       } catch (error) {
         console.error('Error processing WebSocket message:', error);

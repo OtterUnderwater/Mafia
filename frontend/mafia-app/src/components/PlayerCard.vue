@@ -19,12 +19,12 @@
         }"
       >
         <v-img
-          :src="getRoleImage(player.role)"
-          cover
           alt="Role image"
+          cover
+          :src="getRoleImage(player.role)"
           :style="{
-          width: '100%',
-          height: '100%'
+            width: '100%',
+            height: '100%'
           }"
         />
       </v-card>
@@ -44,12 +44,22 @@
             <h4 class="text-h5 font-weight-bold mb-4 text-center">Player №{{ player.id }}</h4>
 
             <v-card
+              v-if="store.isHost || props.player.nickname == store.username"
               :border="`md opacity-100 double ${isMafiaRole ? 'accent' : 'tooltip'}`"
               class="pa-1 text-center bg-transparent"
               max-width="130"
               rounded="lg"
             >
               <h4 class="font-weight-bold" :class="isMafiaRole ? 'text-accent' : 'text-tooltip'">{{ player.role }}</h4>
+            </v-card>
+            <v-card
+              v-else
+              :border="`md opacity-100 double tooltip`"
+              class="pa-1 text-center bg-transparent"
+              max-width="130"
+              rounded="lg"
+            >
+              <h4 class="font-weight-bold text-tooltip"> Role </h4>
             </v-card>
 
             <p class="mt-4 mb-2 text-tooltip">
@@ -70,8 +80,8 @@
             >
               <v-icon
                 :color="n <= player.fouls ? 'accent' : 'tooltip'"
-                style="margin: 0; padding: 0"
                 small
+                style="margin: 0; padding: 0"
               >
                 mdi-circle
               </v-icon>
@@ -90,6 +100,7 @@
   import sheriffImage from '@/assets/images/sheriff.png';
   import mafiaImage from '@/assets/images/mafia.png';
   import civilianImage from '@/assets/images/civilian.png';
+  import { useAppStore } from '@/stores/app.ts';
 
   const props = defineProps<{
     player: Player
@@ -99,13 +110,17 @@
     return props.player.role === RoleEnum.Mafia || props.player.role === RoleEnum.Don;
   });
 
+  const store = useAppStore();
   const getRoleImage = (role: RoleEnum) => {
-    const images = {
-      [RoleEnum.Don]: donImage,
-      [RoleEnum.Sheriff]: sheriffImage,
-      [RoleEnum.Mafia]: mafiaImage,
-      [RoleEnum.Civilian]: civilianImage,
-    };
-    return images[role];
+    if (store.isHost || props.player.nickname === store.username) {
+      const images = {
+        [RoleEnum.Don]: donImage,
+        [RoleEnum.Sheriff]: sheriffImage,
+        [RoleEnum.Mafia]: mafiaImage,
+        [RoleEnum.Civilian]: civilianImage,
+      };
+      return images[role];
+    }
+    return civilianImage;
   };
 </script>

@@ -45,7 +45,9 @@
   import { ref } from 'vue'
   import { ApiClient } from '@/domain/api-client.js';
   import { WebSocketService } from '@/domain/web-socket-client.js';
+  import { useAppStore } from '@/stores/app.ts';
 
+  const store = useAppStore();
   const api = new ApiClient();
   const gameId = ref('');
   const ws = new WebSocketService();
@@ -53,6 +55,7 @@
 
   const createGame = async () => {
     try{
+      store.setIsHost(true);
       await api.postGame();
       ws.connect();
       emit('start-game');

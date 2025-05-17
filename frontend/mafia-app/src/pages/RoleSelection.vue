@@ -102,7 +102,6 @@
         >
           Next
         </v-btn>
-
       </v-card-text>
     </v-card>
   </v-container>
@@ -172,8 +171,9 @@
           null
         );
       }
+      await api.updateGame(null,'/Game');
     }
-    await router.push('/Game')
+    await router.push('/Game');
   };
 
   import donImage from '@/assets/images/don.png'

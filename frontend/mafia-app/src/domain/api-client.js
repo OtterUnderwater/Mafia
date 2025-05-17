@@ -136,10 +136,13 @@ export class ApiClient {
     }
   }
 
-  async updateGame ( result ) {
-    const requestBody = {
-      result,
-    };
+  async updateGame ( result, activity ) {
+    const requestBody = Object.fromEntries(
+      Object.entries({
+        result,
+        activity,
+      }).filter(([_, v]) => v != null)
+    );
     try {
       const response = await this.instance.patch(`/games/game/${this.store.gameId}`, requestBody, {
         headers: { 'Authorization': `Bearer ${this.store.access_token}` },

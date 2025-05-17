@@ -4,9 +4,16 @@ export interface Player {
   id: number;
   nickname: string;
   fouls: number;
-  role: RoleEnum | null;
+  role: RoleEnum;
   status: StatusEnum;
   elimination_reason: EliminationReasonEnum | null;
-  show_role: boolean;
   idPS: number;
+}
+
+export interface JwtPayload {
+  type: string;
+  sub: string;
+  username: string;
+  exp: number;
+  iat: number;
 }

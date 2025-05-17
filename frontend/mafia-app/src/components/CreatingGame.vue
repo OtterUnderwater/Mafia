@@ -29,7 +29,7 @@
       Share the game ID with the players so they can join.
     </div>
     <v-fade-transition>
-      <div v-if="players.length >= 10" class="text-center mt-6">
+      <div v-if="isHost && players.length >= 10" class="text-center mt-6">
         <v-btn
           color="success"
           x-large
@@ -49,6 +49,7 @@
   import { useRouter } from 'vue-router';
 
   const store = useAppStore();
+  const isHost = computed(() => store.isHost);
   const gameId = computed(() => store.gameId);
   const players = computed(() => store.players);
 

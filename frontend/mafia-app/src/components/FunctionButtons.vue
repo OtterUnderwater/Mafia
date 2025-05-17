@@ -155,11 +155,11 @@
     }
     if(countMafia <= 0) {
       victoryRole(RoleEnum.Civilian);
-      if (store.access_token !== '') await api.updateGame(ResultEnum.CiviliansWin);
+      if (store.access_token !== '') await api.updateGame(ResultEnum.CiviliansWin, null);
     }
     else if(countCivilian < countMafia) {
       victoryRole(RoleEnum.Mafia);
-      if (store.access_token !== '') await api.updateGame(ResultEnum.MafiaWin);
+      if (store.access_token !== '') await api.updateGame(ResultEnum.MafiaWin, null);
     }
   };
 </script>

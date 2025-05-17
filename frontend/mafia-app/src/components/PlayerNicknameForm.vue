@@ -61,6 +61,7 @@
 
   const handleStartGame = () => {
     store.setPlayers(players.value);
+    store.setIsHost(true);
     router.push('/RoleSelection');
   };
 </script>

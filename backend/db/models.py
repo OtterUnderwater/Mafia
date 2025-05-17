@@ -25,7 +25,7 @@ class Game(Base):
     )
     date: Mapped[date] = mapped_column(Date(), default=date.today)
     result: Mapped[Optional[ResultEnum]]
-
+    activity: Mapped[Optional[str]]
 
 class PlayerStatus(Base):
     __tablename__ = 'player_status'

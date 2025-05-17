@@ -1,7 +1,7 @@
 <template>
   <v-card class="pa-4" color="transparent">
-    <v-row class="mx-auto" style="min-height: 100px; display: flex; align-items: stretch;">
-      <v-col class="d-flex h-auto" cols="12"  lg="4"  md="3">
+    <v-row v-if="store.isHost" class="mx-auto" style="min-height: 100px; display: flex; align-items: stretch;">
+      <v-col class="d-flex h-auto" cols="12" lg="4" md="3">
         <InfoStageArea :idStage="idStage" @next-stage="nextStage" />
       </v-col>
       <v-col class="d-flex h-auto" cols="12" lg="4" md="3">
@@ -9,6 +9,14 @@
       </v-col>
       <v-col class="d-flex h-auto" cols="12" lg="4" md="6">
         <FunctionButtons :isPaused="isPaused" @toggle-pause="togglePause" @add-time="addTime" />
+      </v-col>
+    </v-row>
+    <v-row v-else class="mx-auto" style="min-height: 100px; display: flex; align-items: stretch;">
+      <v-col class="d-flex h-auto" cols="12" lg="6" md="6">
+        <InfoStageArea :idStage="idStage" @next-stage="nextStage" />
+      </v-col>
+      <v-col class="d-flex h-auto" cols="12" lg="6" md="6">
+        <ClockArea :isPaused="isPaused" :totalSeconds="totalSeconds" @update:totalSeconds="val => totalSeconds = val" />
       </v-col>
     </v-row>
     <v-row class="d-flex flex-wrap justify-center" style="gap: 10px;">

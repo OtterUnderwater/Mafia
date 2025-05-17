@@ -1,9 +1,10 @@
 from collections import defaultdict
+from datetime import date
 
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter, status, Depends
 from typing import Dict, Set, Annotated
 
-from api.schemas import PlayerStatusSchema
+from api.schemas import PlayerStatusSchema, GameSchema
 from api.services.player_status import PlayerStatusService
 from api.services.players import PlayerService
 
@@ -33,7 +34,7 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-async def broadcast_add(game_id: int, service: PlayerStatusService, service_player: PlayerService):
+async def broadcast_all_ps(game_id: int, service: PlayerStatusService, service_player: PlayerService):
     try:
         updated_data = await service.get_players_status(game_id, service_player)
         serialized_data = [PlayerStatusSchema.from_orm(player_status).model_dump() for player_status in updated_data]
@@ -42,7 +43,7 @@ async def broadcast_add(game_id: int, service: PlayerStatusService, service_play
         print(f"Broadcast error: {e}")
 
 
-async def broadcast_update(game_id: int, id: int, service: PlayerStatusService, service_player: PlayerService):
+async def broadcast_update_ps(game_id: int, id: int, service: PlayerStatusService, service_player: PlayerService):
     try:
         updated_data = await service.get_player_status(id, service_player)
         serialized_data = PlayerStatusSchema.from_orm(updated_data).model_dump()
@@ -50,6 +51,14 @@ async def broadcast_update(game_id: int, id: int, service: PlayerStatusService, 
     except Exception as e:
         print(f"Broadcast error: {e}")
 
+async def broadcast_update_game(game: any):
+    try:
+        serialized_data = GameSchema.from_orm(game).dict()
+        if isinstance(serialized_data["date"], date):
+            serialized_data["date"] = serialized_data["date"].isoformat()
+        await manager.broadcast(game.id, {"type": "update_game", "data": serialized_data})
+    except Exception as e:
+        print(f"Broadcast error: {e}")
 
 @router.websocket("/updates_game/{game_id}")
 async def websocket_endpoint(websocket: WebSocket, game_id: int):

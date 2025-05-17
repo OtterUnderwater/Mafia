@@ -1,6 +1,6 @@
 <template>
   <v-card class="pa-0 ma-0 d-flex flex-column flex-grow-1" color="transparent">
-    <v-btn block class="mb-2" color="primary" @click="handleClick">NEXT STAGE</v-btn>
+    <v-btn v-if="store.isHost" block class="mb-2" color="primary" @click="handleClick">NEXT STAGE</v-btn>
     <v-card class="pa-4 ma-0 d-flex justify-center align-center h-100">
       {{ titleStage }}
     </v-card>
@@ -9,7 +9,9 @@
 
 <script setup lang="ts">
   import { defineProps } from 'vue';
+  import { useAppStore } from '@/stores/app.ts';
 
+  const store = useAppStore();
   const props = defineProps<{
     idStage: number;
   }>();
